@@ -2,7 +2,6 @@
 
 namespace BlueM;
 
-use BlueM\SearchstringParser\InvalidSyntaxException;
 use BlueM\SearchstringParser\NotAsLastTermException;
 use BlueM\SearchstringParser\OrWithNegationException;
 use BlueM\SearchstringParser\UnclosedQuoteException;
@@ -120,7 +119,6 @@ class SearchstringParser
     {
         $string     = trim($string);
         $params     = array();
-        $exceptions = array();
 
         // Find quoted strings and remove them from $string
         while (false !== $qstart = strpos($string, '"')) {
@@ -181,8 +179,6 @@ class SearchstringParser
 
     /**
      * @param $terms
-     *
-     * @throws SearchstringParser\InvalidSyntaxException
      */
     protected function classifyTerms($terms)
     {
