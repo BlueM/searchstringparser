@@ -1,5 +1,5 @@
 SearchstringParser Overview
-=========================
+===========================
 
 What is it?
 --------------
@@ -23,20 +23,23 @@ Supported Syntax
 
 Usage
 ========
+```
+#!php
+$search = new SearchstringParser('Your string long OR short NOT "exclude this phrase" X');
 
-	$search = new SearchstringParser('Your string long OR short NOT "exclude this phrase" X');
-
-	$search->getAndTerms();     // array('your', 'search', 'string')
-	$search->getOrTerms();      // array('long', 'short')
-	$search->getNotTerms();     // array('exclude this phrase')
-	$search->getSkippedTerms(); // array('X')
-
+$search->getAndTerms();     // array('your', 'search', 'string')
+$search->getOrTerms();      // array('long', 'short')
+$search->getNotTerms();     // array('exclude this phrase')
+$search->getSkippedTerms(); // array('X')
+```
 
 Changing the minimum length
 ---------------------------
 Simply pass the length to the constructor:
-    $search = new SearchstringParser('...', array('minlength' => 8));
-
+```
+#!php
+$search = new SearchstringParser('...', array('minlength' => 8));
+```
 
 Dealing with parsing errors
 ---------------------------
@@ -51,5 +54,11 @@ The following parsing errors might occur:
 The default behaviour is to not throw exceptions, but to make the best out of the situation. (See unit tests or Testdox output for details.) SearchstringParser will still collect exceptions, so if you want to provide hints to the user, you can do that by getting them via method `getSkippedTerms()`. As SearchstringParser throws different exceptions depending on the type of problem, you can nicely handle (or ignore) the errors separately, for example by performing `instanceof` checks.
 
 If, on the other hand, you prefer to not accept invalid syntax, you can set option “throw” to true when instantiating the class:
-    $search = new SearchstringParser('...', array('throw' => true));
+```
+#!php
+$search = new SearchstringParser('...', array('throw' => true));
+```
 
+Author & License
+====================
+This code was written by Carsten Blüm ([www.bluem.net](http://www.bluem.net)) and licensed under the BSD2 license.
