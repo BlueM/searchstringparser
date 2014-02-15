@@ -10,6 +10,9 @@ use BlueM\SearchstringParser\OrAsFirstOrLastTermException;
 /**
  * Takes a search-engine style search string and breaks it up, recognizing
  * quoted strings as well "-" prefix and "NOT" and "OR".
+ *
+ * @author  Carsten Bluem <carsten@bluem.net>
+ * @license http://www.opensource.org/licenses/bsd-license.php  BSD License
  */
 class SearchstringParser
 {
