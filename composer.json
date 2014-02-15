@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Library for parsing search strings",
     "keywords": ["searching", "parsing"],
-    "homepage": "https://github.com/BlueM/XMLTransformer",
+    "homepage": "https://bitbucket.org/BlueM/searchstringparser",
     "license": "BSD-2",
     "authors": [
         {
