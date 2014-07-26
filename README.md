@@ -7,9 +7,10 @@ SearchstringParser is a class for PHP 5.3 or higher which will take a “typical
 
 If you use a search engine like Solr which does the parsing itself, you will probably not need a library such as this. But in cases where you need switchable search backends but still have a consistent search syntax or where you simply use your SQL database’s fulltext search features, it provides simple and easy parsing.
 
+
 Installation
 ------------
-The preferred way to install this library is through Composer. For this, add `"bluem/searchstringparser": "dev-master"` to the requirements in your `composer.json` file. (Of course, you can specify a version or a range of versions instead of “dev-master”.)
+The preferred way to install this library is through [Composer](https://getcomposer.org). For this, add `"bluem/searchstringparser": "1.*"` to the requirements in your `composer.json` file. As Validation uses [semantic versioning](http://semver.org), by specifying only the major version, this way you will get fixes and feature additions, but not changes which break the API.
 
 Alternatively, you can clone the repository using git.
 
