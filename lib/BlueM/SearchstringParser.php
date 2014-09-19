@@ -120,8 +120,8 @@ class SearchstringParser
      */
     protected function parseSearchString($string)
     {
-        $string     = trim($string);
-        $params     = array();
+        $string = trim($string);
+        $params = array();
 
         // Find quoted strings and remove them from $string
         while (false !== $qstart = strpos($string, '"')) {
@@ -131,7 +131,9 @@ class SearchstringParser
             while (!$qend) {
                 if (false === $i = strpos($string, '"', $offset)) {
                     // No closing quotation mark before end of string >> use rest
-                    $this->exceptions[] = new UnclosedQuoteException('Opening quote not closed before end of string');
+                    $this->exceptions[] = new UnclosedQuoteException(
+                        'Opening quote not closed before end of string'
+                    );
                     $qend = strlen($string);
                 } else {
                     // Make sure this quotation mark is not escaped
@@ -148,7 +150,7 @@ class SearchstringParser
             // Get the character preceding the opening quote character
             $preceding = $qstart > 0 ? substr($string, $qstart - 1, 1) : false;
             // Prepend $phrase with $preceding if $preceding looks
-            // like a boolean modifier (+ -) and decrement $qstart
+            // like a boolean modifier (-) and decrement $qstart
             if ($preceding === '-') {
                 $phrase = $preceding . $phrase;
                 $qstart--;
@@ -156,10 +158,10 @@ class SearchstringParser
 
             // Get unquoted strings before the quotes start
             if ($qstart > 0) {
-                $before = trim(substr($string, 0, $qstart));
-                foreach (preg_split('#\s+#', trim($before)) as $word) {
-                    $params[] = $word;
-                }
+                $params = array_merge(
+                    $params,
+                    $this->splitAtWhitespace(substr($string, 0, $qstart))
+                );
             }
 
             $params[] = $phrase;
@@ -168,9 +170,7 @@ class SearchstringParser
 
         // Process the remaining string
         if (trim($string)) {
-            foreach (preg_split('#\s+#', trim($string)) as $word) {
-                $params[] = $word;
-            }
+            $params = array_merge($params, $this->splitAtWhitespace($string));
         }
 
         $this->classifyTerms($params);
@@ -181,9 +181,19 @@ class SearchstringParser
     }
 
     /**
-     * @param $terms
+     * @param string $string
+     *
+     * @return array
      */
-    protected function classifyTerms($terms)
+    protected function splitAtWhitespace($string)
+    {
+        return preg_split('#\s+#', trim($string));
+    }
+
+    /**
+     * @param array $terms
+     */
+    protected function classifyTerms(array $terms)
     {
         $classified = array();
 
@@ -217,19 +227,25 @@ class SearchstringParser
             unset($classified[$i]);
 
             if ($i === 0) {
-                $this->exceptions[] = new OrAsFirstOrLastTermException('OR cannot be used as first or last term');
+                $this->exceptions[] = new OrAsFirstOrLastTermException(
+                    'OR cannot be used as first or last term'
+                );
                 continue;
             }
 
             if ($i === $ii - 1) {
-                $this->exceptions[] = new OrAsFirstOrLastTermException('OR cannot be used as first or last term');
+                $this->exceptions[] = new OrAsFirstOrLastTermException(
+                    'OR cannot be used as first or last term'
+                );
                 break;
             }
 
             if ('|' === $classified[$i - 1][0]) {
                 // Previous term already "OR"ed, nothing to do
             } elseif ('-' === $classified[$i - 1][0]) {
-                $this->exceptions[] = new OrWithNegationException('Cannot use OR with a term that is negated using - or NOT');
+                $this->exceptions[] = new OrWithNegationException(
+                    'Cannot use OR with a term that is negated using - or NOT'
+                );
             } else {
                 $classified[$i - 1][0] = '|';
             }
@@ -237,7 +253,9 @@ class SearchstringParser
             $i ++;
 
             if ('-' === $classified[$i][0]) {
-                $this->exceptions[] = new OrWithNegationException('Cannot use OR with a term that is negated using - or NOT');
+                $this->exceptions[] = new OrWithNegationException(
+                    'Cannot use OR with a term that is negated using - or NOT'
+                );
             } else {
                 $classified[$i][0] = '|';
             }
