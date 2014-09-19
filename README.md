@@ -10,9 +10,9 @@ If you use a search engine like Solr which does the parsing itself, you will pro
 
 Installation
 ------------
-The preferred way to install this library is through [Composer](https://getcomposer.org). For this, add `"bluem/searchstringparser": "1.*"` to the requirements in your `composer.json` file. As Validation uses [semantic versioning](http://semver.org), by specifying only the major version, this way you will get fixes and feature additions, but not changes which break the API.
+The preferred way to install this library is through [Composer](https://getcomposer.org). For this, add `"bluem/searchstringparser": "~1.0"` to the requirements in your `composer.json` file. As this library uses [semantic versioning](http://semver.org), you will get fixes and feature additions when running `composer update`, but not changes which break the API.
 
-Alternatively, you can clone the repository using git.
+Alternatively, you can clone the repository using git or download a tagged release.
 
 
 Supported Syntax
