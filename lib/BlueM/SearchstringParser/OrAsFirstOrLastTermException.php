@@ -7,5 +7,5 @@ namespace BlueM\SearchstringParser;
  */
 class OrAsFirstOrLastTermException extends InvalidSyntaxException
 {
-
+    protected $message = 'OR cannot be used as first or last term';
 }

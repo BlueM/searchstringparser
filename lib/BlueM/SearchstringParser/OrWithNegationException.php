@@ -7,5 +7,5 @@ namespace BlueM\SearchstringParser;
  */
 class OrWithNegationException extends InvalidSyntaxException
 {
-
+    protected $message = 'Cannot use OR with a term that is negated using - or NOT';
 }

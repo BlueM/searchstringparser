@@ -7,5 +7,5 @@ namespace BlueM\SearchstringParser;
  */
 class NotAsLastTermException extends InvalidSyntaxException
 {
-
+    protected $message = 'NOT cannot be used as last term';
 }

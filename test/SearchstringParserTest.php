@@ -279,6 +279,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @expectedException \BlueM\SearchstringParser\NotAsLastTermException
+     * @expectedExceptionMessage NOT cannot be used as last term
      */
     public function ifTheLastTermIsNotAnExceptionIsThrownIfTheThrowOptionIsSet()
     {
@@ -303,6 +304,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @expectedException \BlueM\SearchstringParser\OrAsFirstOrLastTermException
+     * @expectedExceptionMessage OR cannot be used as first or last term
      */
     public function ifTheFirstTermIsOrAnExceptionIsThrownIfTheThrowOptionIsSet()
     {
@@ -351,6 +353,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @expectedException \BlueM\SearchstringParser\OrWithNegationException
+     * @expectedExceptionMessage Cannot use OR with a term that is negated
      */
     public function ifANegatedTermPrecedesAnOrAnExceptionIsThrownIfTheThrowOptionIsSet()
     {

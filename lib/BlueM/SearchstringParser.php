@@ -208,7 +208,7 @@ class SearchstringParser
 
             if ('not' === strtolower($terms[$i])) {
                 if ($i === $ii - 1) {
-                    $this->exceptions[] = new NotAsLastTermException('NOT cannot be used as last term');
+                    $this->exceptions[] = new NotAsLastTermException();
                     break;
                 }
                 $i ++;
@@ -229,25 +229,19 @@ class SearchstringParser
             unset($classified[$i]);
 
             if ($i === 0) {
-                $this->exceptions[] = new OrAsFirstOrLastTermException(
-                    'OR cannot be used as first or last term'
-                );
+                $this->exceptions[] = new OrAsFirstOrLastTermException();
                 continue;
             }
 
             if ($i === $ii - 1) {
-                $this->exceptions[] = new OrAsFirstOrLastTermException(
-                    'OR cannot be used as first or last term'
-                );
+                $this->exceptions[] = new OrAsFirstOrLastTermException();
                 break;
             }
 
             if ('|' === $classified[$i - 1][0]) {
                 // Previous term already "OR"ed, nothing to do
             } elseif ('-' === $classified[$i - 1][0]) {
-                $this->exceptions[] = new OrWithNegationException(
-                    'Cannot use OR with a term that is negated using - or NOT'
-                );
+                $this->exceptions[] = new OrWithNegationException();
             } else {
                 $classified[$i - 1][0] = '|';
             }
@@ -255,9 +249,7 @@ class SearchstringParser
             $i ++;
 
             if ('-' === $classified[$i][0]) {
-                $this->exceptions[] = new OrWithNegationException(
-                    'Cannot use OR with a term that is negated using - or NOT'
-                );
+                $this->exceptions[] = new OrWithNegationException();
             } else {
                 $classified[$i][0] = '|';
             }
