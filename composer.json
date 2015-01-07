@@ -4,7 +4,7 @@
     "description": "Library for parsing search strings",
     "keywords": ["searching", "parsing"],
     "homepage": "https://bitbucket.org/BlueM/searchstringparser",
-    "license": "BSD-2",
+    "license": "BSD-2-Clause",
     "authors": [
         {
             "name": "Carsten Blüm",
