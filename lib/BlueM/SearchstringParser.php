@@ -12,7 +12,7 @@ use BlueM\SearchstringParser\OrAsFirstOrLastTermException;
  * quoted strings as well "-" prefix and "NOT" and "OR".
  *
  * @author  Carsten Bluem <carsten@bluem.net>
- * @license http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @license http://www.opensource.org/licenses/bsd-license.php BSD 2-Clause License
  */
 class SearchstringParser
 {
@@ -64,7 +64,7 @@ class SearchstringParser
         }
 
         if (array_key_exists('minlength', $options)) {
-            if (strval(intval($options['minlength'])) != strval($options['minlength']) or
+            if (strval(intval($options['minlength'])) != strval($options['minlength']) ||
                 intval($options['minlength']) < 1) {
                 throw new \InvalidArgumentException('Invalid minimum length');
             }
@@ -175,7 +175,7 @@ class SearchstringParser
 
         $this->classifyTerms($params);
 
-        if ($this->options['throw'] and count($this->exceptions)) {
+        if ($this->options['throw'] && count($this->exceptions)) {
             throw $this->exceptions[0];
         }
     }

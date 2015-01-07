@@ -68,4 +68,4 @@ $search = new SearchstringParser('...', array('throw' => true));
 
 Author & License
 ====================
-This code was written by Carsten Blüm ([www.bluem.net](http://www.bluem.net)) and licensed under the BSD2 license.
+This code was written by Carsten Blüm ([www.bluem.net](http://www.bluem.net)) and licensed under the BSD 2-Clause license.
