@@ -175,7 +175,7 @@ class SearchstringParser
             $params = array_merge($params, $this->splitAtWhitespace($string));
         }
 
-        $this->classifyTerms($params);
+        $this->categorizeTerms($params);
 
         if ($this->options['throw'] && count($this->exceptions)) {
             throw $this->exceptions[0];
@@ -195,14 +195,14 @@ class SearchstringParser
     /**
      * @param array $terms
      */
-    protected function classifyTerms(array $terms)
+    protected function categorizeTerms(array $terms)
     {
-        $classified = array();
+        $categorized = array();
 
         for ($i = 0, $ii = count($terms); $i < $ii; $i++) {
 
             if ('-' === substr($terms[$i], 0, 1)) {
-                $classified[] = array('-', substr($terms[$i], 1));
+                $categorized[] = array('-', substr($terms[$i], 1));
                 continue;
             }
 
@@ -212,21 +212,21 @@ class SearchstringParser
                     break;
                 }
                 $i ++;
-                $classified[] = array('-', $terms[$i]);
+                $categorized[] = array('-', $terms[$i]);
                 continue;
             }
 
-            $classified[] = array('+', $terms[$i]);
+            $categorized[] = array('+', $terms[$i]);
         }
 
         // Find "OR" pairs
-        for ($i = 0, $ii = count($classified); $i < $ii; $i++) {
+        for ($i = 0, $ii = count($categorized); $i < $ii; $i++) {
 
-            if ('or' !== strtolower($classified[$i][1])) {
+            if ('or' !== strtolower($categorized[$i][1])) {
                 continue; // Not interested in this term
             }
 
-            unset($classified[$i]);
+            unset($categorized[$i]);
 
             if ($i === 0) {
                 $this->exceptions[] = new OrAsFirstOrLastTermException();
@@ -238,24 +238,24 @@ class SearchstringParser
                 break;
             }
 
-            if ('|' === $classified[$i - 1][0]) {
+            if ('|' === $categorized[$i - 1][0]) {
                 // Previous term already "OR"ed, nothing to do
-            } elseif ('-' === $classified[$i - 1][0]) {
+            } elseif ('-' === $categorized[$i - 1][0]) {
                 $this->exceptions[] = new OrWithNegationException();
             } else {
-                $classified[$i - 1][0] = '|';
+                $categorized[$i - 1][0] = '|';
             }
 
             $i ++;
 
-            if ('-' === $classified[$i][0]) {
+            if ('-' === $categorized[$i][0]) {
                 $this->exceptions[] = new OrWithNegationException();
             } else {
-                $classified[$i][0] = '|';
+                $categorized[$i][0] = '|';
             }
         }
 
-        foreach ($classified as $term) {
+        foreach ($categorized as $term) {
             if (!$term[1]) {
                 continue;
             }
