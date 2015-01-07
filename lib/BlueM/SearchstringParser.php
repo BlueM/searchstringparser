@@ -16,7 +16,6 @@ use BlueM\SearchstringParser\OrAsFirstOrLastTermException;
  */
 class SearchstringParser
 {
-
     /**
      * @var array
      */
@@ -52,7 +51,10 @@ class SearchstringParser
 
     /**
      * @param       $string
-     * @param array $options [optional] #todo
+     * @param array $options Associative array with 0 or more of keys "minlength"
+     *                       (minimum length in characters a search term or phrase must
+     *                       have; default value: 2) and "throw" (bool: throw an exception
+     *                       in case of parsing error?; default: false)
      *
      * @throws \InvalidArgumentException
      *
