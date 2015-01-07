@@ -1,3 +1,5 @@
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/2dc0e9b6-2357-40bd-a56b-9a8dade3408f/mini.png)](https://insight.sensiolabs.com/projects/2dc0e9b6-2357-40bd-a56b-9a8dade3408f)
+
 SearchstringParser Overview
 ===========================
 
