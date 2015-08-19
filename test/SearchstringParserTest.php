@@ -67,7 +67,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function getTheAndTerms()
+    public function theAndTermsAreReturnedByTheGetter()
     {
         $search = new SearchstringParser('Hello World');
 
@@ -81,7 +81,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function getTheOrTerms()
+    public function theOrTermsAreReturnedByTheGetter()
     {
         $search = new SearchstringParser('Hello World');
 
@@ -95,7 +95,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function getTheNotTerms()
+    public function theNotTermsAreReturnedByTheGetter()
     {
         $search = new SearchstringParser('Hello World');
 
@@ -109,7 +109,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function getTheSkippedTerms()
+    public function theSkippedTermsAreReturnedByTheGetter()
     {
         $search = new SearchstringParser('Hello World');
 
@@ -123,7 +123,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function getTheExceptions()
+    public function theExceptionsAreReturnedByTheGetter()
     {
         $search    = new SearchstringParser('Hello World');
         $exception = new NotAsLastTermException();
@@ -138,7 +138,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function parseASearchStringWithoutModifiers()
+    public function allTermsInASearchStringWithoutModifiersAreRegardedAsRequired()
     {
         $search = new SearchstringParser('Hello World');
 
@@ -242,7 +242,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function aTermWhichIsShortedThanTheDefinedMinimumIsSkipped()
+    public function aTermWhichIsShorterThanTheDefinedMinimumIsSkipped()
     {
         $search = new SearchstringParser('AB C');
 
@@ -255,7 +255,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function parseASearchStringContainingAMixtureOfEverything()
+    public function aCombinationOfSupportedSyntaxesIsParsedCorrectly()
     {
         $search = new SearchstringParser('"search string parser" "PHP 5.4" OR "PHP 5.3" NOT "PHP 4" NOT C# -C++ C');
 
