@@ -16,6 +16,10 @@ use BlueM\SearchstringParser\OrAsFirstOrLastTermException;
  */
 class SearchstringParser
 {
+    const SYMBOL_AND = '+';
+    const SYMBOL_OR  = '|';
+    const SYMBOL_NOT = '-';
+
     /**
      * @var array
      */
@@ -154,7 +158,7 @@ class SearchstringParser
             $preceding = $qstart > 0 ? substr($string, $qstart - 1, 1) : false;
             // Prepend $phrase with $preceding if $preceding looks
             // like a boolean modifier (-) and decrement $qstart
-            if ($preceding === '-') {
+            if ($preceding === static::SYMBOL_NOT) {
                 $phrase = $preceding . $phrase;
                 $qstart --;
             }
@@ -202,8 +206,8 @@ class SearchstringParser
 
         for ($i = 0, $ii = count($terms); $i < $ii; $i ++) {
 
-            if ('-' === substr($terms[$i], 0, 1)) {
-                $categorized[] = array('-', substr($terms[$i], 1));
+            if (self::SYMBOL_NOT === substr($terms[$i], 0, 1)) {
+                $categorized[] = array(self::SYMBOL_NOT, substr($terms[$i], 1));
                 continue;
             }
 
@@ -213,18 +217,45 @@ class SearchstringParser
                     break;
                 }
                 $i ++;
-                $categorized[] = array('-', $terms[$i]);
+                $categorized[] = array(static::SYMBOL_NOT, $terms[$i]);
                 continue;
             }
 
-            $categorized[] = array('+', $terms[$i]);
+            $categorized[] = array(static::SYMBOL_AND, $terms[$i]);
         }
 
-        // Find "OR" pairs
+        $categorized = $this->processOr($categorized);
+
+        foreach ($categorized as $term) {
+            if (!$term[1]) {
+                continue;
+            }
+            if (mb_strlen($term[1]) < $this->options['minlength']) {
+                $this->skipped[] = $term[1];
+            } elseif (static::SYMBOL_AND === $term[0]) {
+                $this->andTerms[] = $term[1];
+            } elseif (static::SYMBOL_NOT === $term[0]) {
+                $this->notTerms[] = $term[1];
+            } else {
+                $this->orTerms[] = $term[1];
+            }
+        }
+    }
+
+    /**
+     * Locates and handles "OR" terms (case-insensitive)
+     *
+     * @param $categorized
+     *
+     * @return mixed
+     */
+    protected function processOr($categorized)
+    {
         for ($i = 0, $ii = count($categorized); $i < $ii; $i ++) {
 
             if ('or' !== strtolower($categorized[$i][1])) {
-                continue; // Not interested in this term
+                // Not interested in this
+                continue;
             }
 
             unset($categorized[$i]);
@@ -239,37 +270,24 @@ class SearchstringParser
                 break;
             }
 
-            if ('|' !== $categorized[$i - 1][0]) {
+            if (static::SYMBOL_OR !== $categorized[$i - 1][0]) {
                 // Previous term not "OR"ed
-                if ('-' === $categorized[$i - 1][0]) {
+                if (self::SYMBOL_NOT === $categorized[$i - 1][0]) {
                     $this->exceptions[] = new OrWithNegationException();
                 } else {
-                    $categorized[$i - 1][0] = '|';
+                    $categorized[$i - 1][0] = static::SYMBOL_OR;
                 }
             }
 
             $i ++;
 
-            if ('-' === $categorized[$i][0]) {
+            if (static::SYMBOL_NOT === $categorized[$i][0]) {
                 $this->exceptions[] = new OrWithNegationException();
             } else {
-                $categorized[$i][0] = '|';
+                $categorized[$i][0] = static::SYMBOL_OR;
             }
         }
 
-        foreach ($categorized as $term) {
-            if (!$term[1]) {
-                continue;
-            }
-            if (mb_strlen($term[1]) < $this->options['minlength']) {
-                $this->skipped[] = $term[1];
-            } elseif ('+' === $term[0]) {
-                $this->andTerms[] = $term[1];
-            } elseif ('-' === $term[0]) {
-                $this->notTerms[] = $term[1];
-            } else {
-                $this->orTerms[] = $term[1];
-            }
-        }
+        return $categorized;
     }
 }
