@@ -9,7 +9,7 @@ use BlueM\SearchstringParser\OrAsFirstOrLastTermException;
 
 /**
  * Takes a search-engine style search string and breaks it up, recognizing
- * quoted strings as well "-" prefix and "NOT" and "OR".
+ * quoted strings, "+" and "-" prefixes as well as "NOT" and "OR".
  *
  * @author  Carsten Bluem <carsten@bluem.net>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD 2-Clause License
@@ -50,11 +50,13 @@ class SearchstringParser
     );
 
     /**
-     * @param       $string
-     * @param array $options Associative array with 0 or more of keys "minlength"
-     *                       (minimum length in characters a search term or phrase must
-     *                       have; default value: 2) and "throw" (bool: throw an exception
-     *                       in case of parsing error?; default: false)
+     * Constructor. Takes a string and immediately parses it.
+     *
+     * @param string $string  String to be parsed
+     * @param array  $options Associative array with 0 or more of keys of: "minlength"
+     *                        (minimum length in characters a search term or phrase must
+     *                        have; default value: 2) / "throw" (bool: throw an exception
+     *                        in case of parsing error?; default: false)
      *
      * @throws \InvalidArgumentException
      *
@@ -66,11 +68,10 @@ class SearchstringParser
         }
 
         if (array_key_exists('minlength', $options)) {
-            if (strval(intval($options['minlength'])) != strval($options['minlength']) ||
-                intval($options['minlength']) < 1) {
+            if (!preg_match('/^[1-9]\d*$/', trim($options['minlength']))) {
                 throw new \InvalidArgumentException('Invalid minimum length');
             }
-            $this->options['minlength'] = $options['minlength'];
+            $this->options['minlength'] = (int) $options['minlength'];
         }
 
         $this->options['throw'] = !empty($options['throw']);
@@ -139,10 +140,10 @@ class SearchstringParser
                     $qend = strlen($string);
                 } else {
                     // Make sure this quotation mark is not escaped
-                    if (substr($string, $i - 1, 1) != '\\') {
+                    if ('\\' !== substr($string, $i - 1, 1)) {
                         $qend = $i; // Not escaped >> set $qend in order to break loop
                     } else {
-                        $offset++; // Escaped >> proceed with next character
+                        $offset ++; // Escaped >> proceed with next character
                     }
                 }
             }
@@ -155,7 +156,7 @@ class SearchstringParser
             // like a boolean modifier (-) and decrement $qstart
             if ($preceding === '-') {
                 $phrase = $preceding . $phrase;
-                $qstart--;
+                $qstart --;
             }
 
             // Get unquoted strings before the quotes start
@@ -199,7 +200,7 @@ class SearchstringParser
     {
         $categorized = array();
 
-        for ($i = 0, $ii = count($terms); $i < $ii; $i++) {
+        for ($i = 0, $ii = count($terms); $i < $ii; $i ++) {
 
             if ('-' === substr($terms[$i], 0, 1)) {
                 $categorized[] = array('-', substr($terms[$i], 1));
@@ -220,7 +221,7 @@ class SearchstringParser
         }
 
         // Find "OR" pairs
-        for ($i = 0, $ii = count($categorized); $i < $ii; $i++) {
+        for ($i = 0, $ii = count($categorized); $i < $ii; $i ++) {
 
             if ('or' !== strtolower($categorized[$i][1])) {
                 continue; // Not interested in this term
@@ -238,12 +239,13 @@ class SearchstringParser
                 break;
             }
 
-            if ('|' === $categorized[$i - 1][0]) {
-                // Previous term already "OR"ed, nothing to do
-            } elseif ('-' === $categorized[$i - 1][0]) {
-                $this->exceptions[] = new OrWithNegationException();
-            } else {
-                $categorized[$i - 1][0] = '|';
+            if ('|' !== $categorized[$i - 1][0]) {
+                // Previous term not "OR"ed
+                if ('-' === $categorized[$i - 1][0]) {
+                    $this->exceptions[] = new OrWithNegationException();
+                } else {
+                    $categorized[$i - 1][0] = '|';
+                }
             }
 
             $i ++;
