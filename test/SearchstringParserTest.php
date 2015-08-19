@@ -177,6 +177,19 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function anAndMakesTheAdjacentTermsRequired()
+    {
+        $search = new SearchstringParser('Hello AND World AnotherString');
+
+        $this->assertSame(array('Hello', 'World', 'AnotherString'), $search->getAndTerms());
+        $this->assertSame(array(), $search->getOrTerms());
+        $this->assertSame(array(), $search->getOrTerms());
+        $this->assertSame(array(), $search->getSkippedTerms());
+    }
+
+    /**
+     * @test
+     */
     public function anOrMakesThePreviousAndNextTermOptional()
     {
         $search = new SearchstringParser('term1 OR term2');

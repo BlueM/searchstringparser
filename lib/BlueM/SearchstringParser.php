@@ -224,7 +224,7 @@ class SearchstringParser
             $categorized[] = array(static::SYMBOL_AND, $terms[$i]);
         }
 
-        $categorized = $this->processOr($categorized);
+        $categorized = $this->processAndAndOr($categorized);
 
         foreach ($categorized as $term) {
             if (!$term[1]) {
@@ -243,19 +243,26 @@ class SearchstringParser
     }
 
     /**
-     * Locates and handles "OR" terms (case-insensitive)
+     * Locates and handles "AND" and "OR" terms (case-insensitive)
      *
      * @param $categorized
      *
      * @return mixed
      */
-    protected function processOr($categorized)
+    protected function processAndAndOr($categorized)
     {
         for ($i = 0, $ii = count($categorized); $i < $ii; $i ++) {
 
-            if ('or' !== strtolower($categorized[$i][1])) {
-                // Not interested in this
-                continue;
+            switch (strtolower($categorized[$i][1])) {
+                case 'or':
+                    $symbol = static::SYMBOL_OR;
+                    break;
+                case 'and':
+                    $symbol = static::SYMBOL_AND;
+                    break;
+                default:
+                    // Not interested in this
+                    continue 2;
             }
 
             unset($categorized[$i]);
@@ -270,12 +277,12 @@ class SearchstringParser
                 break;
             }
 
-            if (static::SYMBOL_OR !== $categorized[$i - 1][0]) {
-                // Previous term not "OR"ed
+            if ($symbol !== $categorized[$i - 1][0]) {
+                // Previous term does not have same modifier
                 if (self::SYMBOL_NOT === $categorized[$i - 1][0]) {
                     $this->exceptions[] = new OrWithNegationException();
                 } else {
-                    $categorized[$i - 1][0] = static::SYMBOL_OR;
+                    $categorized[$i - 1][0] = $symbol;
                 }
             }
 
@@ -284,7 +291,7 @@ class SearchstringParser
             if (static::SYMBOL_NOT === $categorized[$i][0]) {
                 $this->exceptions[] = new OrWithNegationException();
             } else {
-                $categorized[$i][0] = static::SYMBOL_OR;
+                $categorized[$i][0] = $symbol;
             }
         }
 
