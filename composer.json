@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Library for parsing search strings",
     "keywords": ["searching", "parsing"],
-    "homepage": "https://bitbucket.org/BlueM/searchstringparser",
+    "homepage": "https://github.com/BlueM/searchstringparser",
     "license": "BSD-2-Clause",
     "authors": [
         {
