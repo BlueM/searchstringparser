@@ -1,4 +1,5 @@
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/2dc0e9b6-2357-40bd-a56b-9a8dade3408f/mini.png)](https://insight.sensiolabs.com/projects/2dc0e9b6-2357-40bd-a56b-9a8dade3408f)
+[![Build Status](https://travis-ci.org/BlueM/searchstringparser.svg?branch=master)](https://travis-ci.org/BlueM/searchstringparser)
 
 SearchstringParser Overview
 ===========================
@@ -84,6 +85,10 @@ This code was written by Carsten Blüm ([www.bluem.net](http://www.bluem.net)) a
 
 Changes from earlier versions
 =============================
+
+From 2.0 to 2.0.1
+-----------------
+* HHVM compatibility
 
 From 1.0.1 to 2.0
 -----------------
