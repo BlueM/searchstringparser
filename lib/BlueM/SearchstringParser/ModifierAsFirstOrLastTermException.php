@@ -7,5 +7,11 @@ namespace BlueM\SearchstringParser;
  */
 class ModifierAsFirstOrLastTermException extends InvalidSyntaxException
 {
-    protected $message = 'The search string must neither start nor end with “AND” or “OR”.';
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct($message = '', $code = 0, Exception $previous = null)
+    {
+        parent::__construct('The search string must neither start nor end with “AND” or “OR”.');
+    }
 }

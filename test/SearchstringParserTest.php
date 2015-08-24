@@ -329,6 +329,7 @@ class SearchstringParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      * @expectedException \BlueM\SearchstringParser\UnclosedQuoteException
+     * @expectedExceptionMessage unclosed quote
      */
     public function anUnclosedPhraseThrowsAnExceptionIfTheThrowOptionIsSet()
     {

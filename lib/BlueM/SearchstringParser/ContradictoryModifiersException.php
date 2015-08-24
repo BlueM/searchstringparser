@@ -9,5 +9,11 @@ namespace BlueM\SearchstringParser;
  */
 class ContradictoryModifiersException extends InvalidSyntaxException
 {
-    protected $message = 'The search string contains contradictory instructions. (Examples: “-Word1 OR Word2”, “Word1 NOT +Word”)';
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct($message = '', $code = 0, Exception $previous = null)
+    {
+        parent::__construct('The search string contains contradictory instructions. (Examples: “-Word1 OR Word2”, “Word1 NOT +Word”)');
+    }
 }
