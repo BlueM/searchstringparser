@@ -43,8 +43,7 @@ Example with `array('defaultOperator' => SearchstringParser:SYMBOL_AND)`:
 
 Usage
 ========
-```
-#!php
+```php
 $search = new BlueM\SearchstringParser('Your AND string long OR short NOT "exclude this phrase" X');
 
 $search->getAndTerms();     // array('your', 'string')
@@ -57,8 +56,7 @@ Changing the minimum length
 ---------------------------
 Simply pass the length to the constructor:
 
-```
-#!php
+```php
 $search = new BlueM\SearchstringParser('...', array('minlength' => 3));
 ```
 
