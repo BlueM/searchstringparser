@@ -2,10 +2,10 @@
 
 namespace BlueM;
 
+use BlueM\SearchstringParser\ContradictoryModifiersException;
 use BlueM\SearchstringParser\NotAsLastTermException;
-use BlueM\SearchstringParser\OrWithNegationException;
 use BlueM\SearchstringParser\UnclosedQuoteException;
-use BlueM\SearchstringParser\OrAsFirstOrLastTermException;
+use BlueM\SearchstringParser\ModifierAsFirstOrLastTermException;
 
 /**
  * Takes a search-engine style search string and breaks it up, recognizing
@@ -59,8 +59,11 @@ class SearchstringParser
      * @param string $string  String to be parsed
      * @param array  $options Associative array with 0 or more of keys of: "minlength"
      *                        (minimum length in characters a search term or phrase must
-     *                        have; default value: 2) / "throw" (bool: throw an exception
-     *                        in case of parsing error?; default: false)
+     *                        have; default value: 2), "throw" (bool: throw an exception
+     *                        in case of parsing error?; default: false) or
+     *                        "defaultOperator" (set to SearchstringParser:SYMBOL_AND
+     *                        if you want unclassified terms to be regarded as required.
+     *                        Default is SearchstringParser:SYMBOL_OR).
      *
      * @throws \InvalidArgumentException
      *
@@ -78,8 +81,28 @@ class SearchstringParser
             $this->options['minlength'] = (int) $options['minlength'];
         }
 
+        if (array_key_exists('defaultOperator', $options)) {
+            if (self::SYMBOL_AND === $options['defaultOperator'] ||
+                self::SYMBOL_OR === $options['defaultOperator'])
+            {
+                $defaultOperator = $options['defaultOperator'];
+            } else {
+                throw new \InvalidArgumentException('Invalid default operator');
+            }
+        } else {
+            $defaultOperator = self::SYMBOL_OR;
+        }
+
         $this->options['throw'] = !empty($options['throw']);
-        $this->parseSearchString($string);
+
+        $terms = $this->parseToTerms($string);
+        $terms = $this->processModifierTerms($terms);
+
+        $this->categorizeTerms($terms, $defaultOperator);
+
+        if ($this->options['throw'] && count($this->exceptions)) {
+            throw $this->exceptions[0];
+        }
     }
 
     /**
@@ -123,18 +146,23 @@ class SearchstringParser
     }
 
     /**
+     * Splits the search string into "terms", which can be words or quoted phrases
+     *
      * @param string $string The search string
+     *
+     * @return array
      */
-    protected function parseSearchString($string)
+    protected function parseToTerms($string)
     {
         $string = trim($string);
-        $params = array();
+        $terms  = array();
 
         // Find quoted strings and remove them from $string
         while (false !== $qstart = strpos($string, '"')) {
             // Try to find closing quotation mark, starting at $qstart + 1
             $offset = $qstart + 1;
             $qend   = 0;
+
             while (!$qend) {
                 if (false === $i = strpos($string, '"', $offset)) {
                     // No closing quotation mark before end of string >> use rest
@@ -156,104 +184,61 @@ class SearchstringParser
 
             // Get the character preceding the opening quote character
             $preceding = $qstart > 0 ? substr($string, $qstart - 1, 1) : false;
+
             // Prepend $phrase with $preceding if $preceding looks
-            // like a boolean modifier (-) and decrement $qstart
-            if ($preceding === static::SYMBOL_NOT) {
-                $phrase = $preceding . $phrase;
+            // like a modifier symbol and decrement $qstart
+            if (static::SYMBOL_AND === $preceding ||
+                static::SYMBOL_NOT === $preceding
+            ) {
+                $symbol = $preceding;
                 $qstart --;
+            } else {
+                $symbol = null;
             }
 
             // Get unquoted strings before the quotes start
             if ($qstart > 0) {
-                $params = array_merge(
-                    $params,
-                    $this->splitAtWhitespace(substr($string, 0, $qstart))
-                );
+                foreach ($this->processNonPhraseTerms(substr($string, 0, $qstart)) as $term) {
+                    $terms[] = $term;
+                }
             }
 
-            $params[] = $phrase;
-            $string   = substr($string, $qend + 1);
+            $terms[] = array($symbol, $phrase);
+            $string  = substr($string, $qend + 1);
         }
 
         // Process the remaining string
         if (trim($string)) {
-            $params = array_merge($params, $this->splitAtWhitespace($string));
+            foreach ($this->processNonPhraseTerms($string) as $term) {
+                $terms[] = $term;
+            }
         }
 
-        $this->categorizeTerms($params);
-
-        if ($this->options['throw'] && count($this->exceptions)) {
-            throw $this->exceptions[0];
-        }
-    }
-
-    /**
-     * @param string $string
-     *
-     * @return array
-     */
-    protected function splitAtWhitespace($string)
-    {
-        return preg_split('#\s+#', trim($string));
+        return $terms;
     }
 
     /**
      * @param array $terms
-     */
-    protected function categorizeTerms(array $terms)
-    {
-        $categorized = array();
-
-        for ($i = 0, $ii = count($terms); $i < $ii; $i ++) {
-
-            if (self::SYMBOL_NOT === substr($terms[$i], 0, 1)) {
-                $categorized[] = array(self::SYMBOL_NOT, substr($terms[$i], 1));
-                continue;
-            }
-
-            if ('not' === strtolower($terms[$i])) {
-                if ($i === $ii - 1) {
-                    $this->exceptions[] = new NotAsLastTermException();
-                    break;
-                }
-                $i ++;
-                $categorized[] = array(static::SYMBOL_NOT, $terms[$i]);
-                continue;
-            }
-
-            $categorized[] = array(static::SYMBOL_AND, $terms[$i]);
-        }
-
-        $categorized = $this->processAndAndOr($categorized);
-
-        foreach ($categorized as $term) {
-            if (!$term[1]) {
-                continue;
-            }
-            if (mb_strlen($term[1]) < $this->options['minlength']) {
-                $this->skipped[] = $term[1];
-            } elseif (static::SYMBOL_AND === $term[0]) {
-                $this->andTerms[] = $term[1];
-            } elseif (static::SYMBOL_NOT === $term[0]) {
-                $this->notTerms[] = $term[1];
-            } else {
-                $this->orTerms[] = $term[1];
-            }
-        }
-    }
-
-    /**
-     * Locates and handles "AND" and "OR" terms (case-insensitive)
      *
-     * @param $categorized
-     *
-     * @return mixed
+     * @return array
      */
-    protected function processAndAndOr($categorized)
+    private function processModifierTerms(array $terms)
     {
-        for ($i = 0, $ii = count($categorized); $i < $ii; $i ++) {
+        for ($i = 0, $ii = count($terms); $i < $ii; $i++) {
 
-            switch (strtolower($categorized[$i][1])) {
+            switch (strtolower($terms[$i][1])) {
+                case 'not':
+                    if (empty($terms[$i + 1][1])) {
+                        $this->exceptions[] = new NotAsLastTermException();
+                    } else {
+                        if (empty($terms[$i + 1][0]) || self::SYMBOL_NOT === $terms[$i + 1][0]) {
+                            $terms[$i + 1][0] = self::SYMBOL_NOT;
+                        } else {
+                            $this->exceptions[] = new ContradictoryModifiersException();
+                        }
+                    }
+                    unset($terms[$i]);
+                    continue 2;
                 case 'or':
                     $symbol = static::SYMBOL_OR;
                     break;
@@ -265,36 +250,91 @@ class SearchstringParser
                     continue 2;
             }
 
-            unset($categorized[$i]);
+            unset($terms[$i]);
 
             if ($i === 0) {
-                $this->exceptions[] = new OrAsFirstOrLastTermException();
+                $this->exceptions[] = new ModifierAsFirstOrLastTermException();
                 continue;
             }
 
             if ($i === $ii - 1) {
-                $this->exceptions[] = new OrAsFirstOrLastTermException();
+                $this->exceptions[] = new ModifierAsFirstOrLastTermException();
                 break;
             }
 
-            if ($symbol !== $categorized[$i - 1][0]) {
+            if ($symbol !== $terms[$i - 1][0]) {
                 // Previous term does not have same modifier
-                if (self::SYMBOL_NOT === $categorized[$i - 1][0]) {
-                    $this->exceptions[] = new OrWithNegationException();
+                if (self::SYMBOL_NOT === $terms[$i - 1][0]) {
+                    $this->exceptions[] = new ContradictoryModifiersException();
                 } else {
-                    $categorized[$i - 1][0] = $symbol;
+                    $terms[$i - 1][0] = $symbol;
                 }
             }
 
             $i ++;
 
-            if (static::SYMBOL_NOT === $categorized[$i][0]) {
-                $this->exceptions[] = new OrWithNegationException();
+            if (static::SYMBOL_NOT === $terms[$i][0]) {
+                $this->exceptions[] = new ContradictoryModifiersException();
             } else {
-                $categorized[$i][0] = $symbol;
+                $terms[$i][0] = $symbol;
             }
         }
 
-        return $categorized;
+        return $terms;
+    }
+
+    /**
+     * @param array $terms
+     */
+    protected function categorizeTerms(array $terms, $defaultOperator)
+    {
+        foreach ($terms as $term) {
+            if (mb_strlen($term[1]) < $this->options['minlength']) {
+                $this->skipped[] = $term[1];
+            } elseif (static::SYMBOL_AND === $term[0]) {
+                $this->andTerms[] = $term[1];
+            } elseif (static::SYMBOL_NOT === $term[0]) {
+                $this->notTerms[] = $term[1];
+            } elseif (static::SYMBOL_OR === $term[0]) {
+                $this->orTerms[] = $term[1];
+            } else {
+                if (self::SYMBOL_AND === $defaultOperator) {
+                    $this->andTerms[] = $term[1];
+                } else {
+                    $this->orTerms[] = $term[1];
+                }
+            }
+        }
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return array
+     */
+    private function processNonPhraseTerms($string)
+    {
+        $terms = array();
+
+        $trimmedString = trim($string);
+
+        if (!$trimmedString) {
+            return array();
+        }
+
+        foreach (preg_split('#\s+#', $trimmedString) as $term) {
+
+            if (self::SYMBOL_AND === substr($term, 0, 1)) {
+                $terms[] = array(self::SYMBOL_AND, substr($term, 1));
+                continue;
+            } elseif (self::SYMBOL_NOT === substr($term, 0, 1)) {
+                $terms[] = array(self::SYMBOL_NOT, substr($term, 1));
+            } else {
+                $terms[] = array(null, $term);
+            }
+
+        }
+
+        return $terms;
     }
 }

@@ -1,36 +1,40 @@
-PHPUnit 3.7.19 by Sebastian Bergmann.
-
-Configuration read from /Users/cb/Documents/Dev/SearchstringParser/phpunit.xml.dist
-
 BlueM\SearchstringParser
  [x] The constructor throws an exception if the search string is empty
  [x] The constructor throws an exception if the minimum length is not an int
  [x] The constructor throws an exception if the minimum length is smaller than 1
  [x] The constructor accepts a valid minimum length
- [x] Get the and terms
- [x] Get the or terms
- [x] Get the not terms
- [x] Get the skipped terms
- [x] Get the exceptions
- [x] Parse a search string without modifiers
+ [x] The AND terms are returned by the getter
+ [x] The OR terms are returned by the getter
+ [x] The NOT terms are returned by the getter
+ [x] The skipped terms are returned by the getter
+ [x] The exceptions are returned by the getter
+ [x] All terms in a search string without modifiers are regarded as optional by default
+ [x] All terms in a search string without modifiers are regarded as mandatory if the default operator is set to AND
  [x] A minus prefix excludes the following term
- [x] A not excludes the following term
- [x] An or makes the previous and next term optional
+ [x] A NOT excludes the following term
+ [x] A plus prefix makes the following term requires
+ [x] An AND makes the previous and next term required
+ [x] An OR makes the previous and next term optional
  [x] Phrases can be defined using quotes
  [x] Escaped quotes inside phrases can be used
  [x] Phrases can be excluded by prefixing them with a minus
- [x] A term which is shorted than the defined minimum is skipped
- [x] Parse a search string containing a mixture of everything
+ [x] A term which is shorter than the defined minimum is skipped
+ [x] A combination of supported syntaxes is parsed correctly
+ [x] A combination of supported syntaxes is parsed correctly with and as default operator
+ [x] A combination of supported syntaxes using and is parsed correctly
  [x] An unclosed phrase throws an exception if the throw option is set
  [x] An unclosed phrase ends silently at the end of string if the throw option is not set
- [x] If the last term is not an exception is thrown if the throw option is set
- [x] If the last term is not it is dropped silently if the throw option is not set
- [x] If the first term is or an exception is thrown if the throw option is set
- [x] If the first term is or it is dropped silently if the throw option is not set
- [x] If the last term is or an exception is thrown if the throw option is set
- [x] If the last term is or it is dropped silently if the throw option is not set
- [x] If a negated term precedes an or an exception is thrown if the throw option is set
- [x] If a negated term precedes an or the or is dropped silently if the throw option is not set
- [x] If a negated term follows an or an exception is thrown if the throw option is set
- [x] If a negated term follows an or the or is dropped silently if the throw option is not set
+ [x] If the last term is NOT an exception is thrown if the throw option is set
+ [x] If the last term is NOT it is dropped silently if the throw option is not set
+ [x] If the first term is AND an exception is thrown if the throw option is set
+ [x] If the first term is OR an exception is thrown if the throw option is set
+ [x] If the first term is OR it is dropped silently if the throw option is not set
+ [x] If the last term is AND an exception is thrown if the throw option is set
+ [x] If the last term is OR an exception is thrown if the throw option is set
+ [x] If the last term is OR it is dropped silently if the throw option is not set
+ [x] If a negated term precedes an OR an exception is thrown if the throw option is set
+ [x] If a negated term precedes an OR the OR is dropped silently if the throw option is not set
+ [x] If a required term is preceded by NOT an exception is thrown if the throw option is set
+ [x] If a negated term follows an OR an exception is thrown if the throw option is set
+ [x] If a negated term follows an OR the OR is dropped silently if the throw option is not set
 
