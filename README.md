@@ -84,6 +84,10 @@ This code was written by Carsten Blüm ([www.bluem.net](http://www.bluem.net)) a
 Changes from earlier versions
 =============================
 
+From 2.0.1 to 2.0.2
+-----------------
+* Use PSR-4 instead of PSR-0
+
 From 2.0 to 2.0.1
 -----------------
 * HHVM compatibility
