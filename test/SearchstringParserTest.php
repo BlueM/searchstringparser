@@ -7,12 +7,12 @@ use BlueM\SearchstringParser\NotAsLastTermException;
 use BlueM\SearchstringParser\ModifierAsFirstOrLastTermException;
 use BlueM\SearchstringParser\UnclosedQuoteException;
 
-require __DIR__ . '/../lib/BlueM/SearchstringParser.php';
-require __DIR__ . '/../lib/BlueM/SearchstringParser/InvalidSyntaxException.php';
-require __DIR__ . '/../lib/BlueM/SearchstringParser/ContradictoryModifiersException.php';
-require __DIR__ . '/../lib/BlueM/SearchstringParser/UnclosedQuoteException.php';
-require __DIR__ . '/../lib/BlueM/SearchstringParser/NotAsLastTermException.php';
-require __DIR__ . '/../lib/BlueM/SearchstringParser/ModifierAsFirstOrLastTermException.php';
+require __DIR__ . '/../src/SearchstringParser.php';
+require __DIR__ . '/../src/SearchstringParser/InvalidSyntaxException.php';
+require __DIR__ . '/../src/SearchstringParser/ContradictoryModifiersException.php';
+require __DIR__ . '/../src/SearchstringParser/UnclosedQuoteException.php';
+require __DIR__ . '/../src/SearchstringParser/NotAsLastTermException.php';
+require __DIR__ . '/../src/SearchstringParser/ModifierAsFirstOrLastTermException.php';
 
 /**
  * Unit tests for BlueM\SearchstringParser
