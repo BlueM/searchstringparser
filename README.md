@@ -13,7 +13,7 @@ If you use a search engine like Apache Solr which does the parsing itself, you m
 
 Installation
 ------------
-The preferred way to install this library is through [Composer](https://getcomposer.org). For this, add `"bluem/searchstringparser": "~1.0"` to the requirements in your `composer.json` file. As this library uses [semantic versioning](http://semver.org), you will get fixes and feature additions when running `composer update`, but not changes which break the API.
+The preferred way to install this library is through [Composer](https://getcomposer.org). For this, add `"bluem/searchstringparser": "~2.0"` to the requirements in your `composer.json` file. As this library uses [semantic versioning](http://semver.org), you will get fixes and feature additions when running `composer update`, but not changes which break the API.
 
 Alternatively, you can clone the repository using git or download a tagged release.
 
