@@ -84,6 +84,15 @@ This code was written by Carsten Blüm ([www.bluem.net](http://www.bluem.net)) a
 Changes from earlier versions
 =============================
 
+From 2.0.3 to 2.0.4
+-----------------
+* Fix namespace issues in exception classes
+* Add PHPUnit as dev-dependency (tests were present, but dependency was missing)
+
+From 2.0.2 to 2.0.3
+-----------------
+* Update in Readme
+
 From 2.0.1 to 2.0.2
 -----------------
 * Use PSR-4 instead of PSR-0
